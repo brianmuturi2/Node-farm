@@ -53,7 +53,7 @@ const server = http.createServer((req, res) => {
 
     // Overview page
     if (pathName === '/' || pathName === '/overview') {
-        const cardsHtml = productArr.map(cur => replaceTemplate(tempCard, cur));
+        const cardsHtml = productArr.map(cur => replaceTemplate(tempCard, cur)).join('');
         tempOverview = tempOverview.replace(/{%PRODUCT_CARDS%}/, cardsHtml);
 
         res.writeHead(200, {
