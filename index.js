@@ -49,10 +49,13 @@ let productArr = JSON.parse(productData);
 
 const server = http.createServer((req, res) => {
     console.log('request url is ', req.url);
-    const pathName = req.url;
+    console.log('parsed url is ', url.parse(req.url, true))
+
+    const { query, pathname } = url.parse(req.url, true);
+    console.log('query id is ', query.id, ' and its type is ', typeof query);
 
     // Overview page
-    if (pathName === '/' || pathName === '/overview') {
+    if (pathname === '/' || pathname === '/overview') {
         const cardsHtml = productArr.map(cur => replaceTemplate(tempCard, cur)).join('');
         tempOverview = tempOverview.replace(/{%PRODUCT_CARDS%}/, cardsHtml);
 
@@ -62,11 +65,21 @@ const server = http.createServer((req, res) => {
         res.end(tempOverview)
 
     // Product page
-    } else if (pathName === '/product') {
-        res.end('This is the product')
+    } else if (pathname === '/product') {
+        let product;
+        if (query.id <=4) {
+            product = productArr[query.id];
+        } else {
+            product = productArr[0];
+        }
+        const prodTemp = replaceTemplate(tempProduct, product);
+        res.writeHead(200, {
+            'Content-type': 'text/html'
+        })
+        res.end(prodTemp);
 
     // Api
-    } else if (pathName === '/api') {
+    } else if (pathname === '/api') {
         res.writeHead(200, {
             'Content-type': 'application/json'
         })
