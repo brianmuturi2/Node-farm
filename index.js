@@ -1,7 +1,8 @@
 const fs = require('fs');
 const http = require('http');
 const url = require('url');
-
+const slugify = require('slugify');
+const replaceTemplate = require('./modules/replaceTemplate');
 /**********************************************************************FILES***********************************************************************/
 
 // Synchronous i.e blocking way
@@ -29,29 +30,21 @@ fs.readFile('./txt/start.txt', 'utf-8', (err, data1) => {
 console.log('Wu hu');
 
 /**********************************************************************WEBSERVER***********************************************************************/
-function replaceTemplate(temp, product) {
-    let output = temp.replace(/{%PRODUCTNAME%}/g, product.productName)
-    output = output.replace(/{%IMAGE%}/g, product.image)
-    output = output.replace(/{%QUANTITY%}/g, product.quantity)
-    output = output.replace(/{%PRICE%}/g, product.price)
-    output = output.replace(/{%ID%}/g, product.id)
-    output = output.replace(/{%LOCATION%}/g, product['from'])
-    output = output.replace(/{%NUTRIENTS%}/g, product.nutrients)
-    output = output.replace(/{%DESCRIPTION%}/g, product.description)
-    if (!product.organic) output = output.replace(/{%NOT_ORGANIC%}/g, 'not-organic')
-    return output;
-}
+
 let tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8');
 let tempCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8');
 let tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8');
 let productData = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 let productArr = JSON.parse(productData);
 
+const slugs = productArr.map(cur => slugify(cur.productName, {lower: true}));
+console.log('slugified is ', slugs);
+
 const server = http.createServer((req, res) => {
     console.log('request url is ', req.url);
     console.log('parsed url is ', url.parse(req.url, true))
 
-    const { query, pathname } = url.parse(req.url, true);
+    const {query, pathname} = url.parse(req.url, true);
     console.log('query id is ', query.id, ' and its type is ', typeof query);
 
     // Overview page
@@ -64,10 +57,10 @@ const server = http.createServer((req, res) => {
         })
         res.end(tempOverview)
 
-    // Product page
+        // Product page
     } else if (pathname === '/product') {
         let product;
-        if (query.id <=4) {
+        if (query.id <= 4) {
             product = productArr[query.id];
         } else {
             product = productArr[0];
@@ -78,14 +71,14 @@ const server = http.createServer((req, res) => {
         })
         res.end(prodTemp);
 
-    // Api
+        // Api
     } else if (pathname === '/api') {
         res.writeHead(200, {
             'Content-type': 'application/json'
         })
         res.end(productData);
 
-    // Not found
+        // Not found
     } else {
         res.writeHead(404, {
             'Content-type': 'text/html',
