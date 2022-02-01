@@ -163,5 +163,5 @@ Brian Muturi - iambmn254@gmail.com
 [license-url]: https://github.com/github_username/repo_name/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/brian-muturi2/
-[product-screenshot]: images/screenshot.png
+[product-screenshot]: templates/node-farm.png
 [jonas]: https://codingheroes.io/
